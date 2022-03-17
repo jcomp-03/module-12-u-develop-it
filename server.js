@@ -21,7 +21,7 @@ const db = mysql.createConnection(
     console.log('Connected to the election database.')
 );
 
-// GET all candidates
+// READ (GET) all candidates
 // API endpoint to select all candidates from the database 
 app.get('/api/candidates', (req, res) => {
   // sql command we're going to feed into db.query
@@ -42,10 +42,9 @@ app.get('/api/candidates', (req, res) => {
       });
   });
 });
-
-// GET a single candidate
+// READ (GET) a single candidate
 // API endpoint to select a specific candidate from the database 
-app.get('/api/candidates/:id', (req, res) => {
+app.get('/api/candidate/:id', (req, res) => {
   const sql = `SELECT candidates.*, parties.name 
                AS party_name 
                FROM candidates 
@@ -66,9 +65,7 @@ app.get('/api/candidates/:id', (req, res) => {
     });
 
 });
-
-
-// Delete a candidate
+// DELETE a candidate
 // API endpoint to delete a specific candidate from the database 
 app.delete('/api/candidate/:id', (req, res) => {
     const sql = `DELETE FROM candidates WHERE id = ?`;
@@ -90,8 +87,7 @@ app.delete('/api/candidate/:id', (req, res) => {
       }
     });
 });
-
-// Create a candidate
+// CREATE a candidate
 // API endpoint to create new candidate and store to table 
 app.post('/api/candidate', ({ body }, res) => {
     // check if any of the candidate properties are missing first
@@ -120,6 +116,94 @@ app.post('/api/candidate', ({ body }, res) => {
             data: body
         });
     });
+});
+
+// UPDATE a candidate's party
+// API endpoint for updating a specific candidate's party
+app.put('/api/candidate/:id', (req, res) => {
+  // ensure a party_id was provided before attempting to update candidate's party
+  // in the database
+  const errors = inputCheck(req.body, 'party_id');
+  // if errors is true, respond with appropriate error message
+  // and return out of the function
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+  const sql = `UPDATE candidates SET party_id = ? 
+               WHERE id = ?`;
+  const params = [req.body.party_id, req.params.id];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      // check if a record was found
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Candidate not found'
+      });
+    } else {
+      res.json({
+        message: 'success',
+        data: req.body,
+        changes: result.affectedRows
+      });
+    }
+  });
+});
+
+
+// READ (GET) all parties
+// API endpoint to select all parties from the database
+app.get('/api/parties', (req, res) => {
+  const sql = `SELECT * FROM parties`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
+// READ (GET) a single party
+// API endpoint to select a specific party from the database
+app.get('/api/party/:id', (req, res) => {
+  const sql = `SELECT * FROM parties WHERE id = ?`;
+  const params = [req.params.id];
+  db.query(sql, params, (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: row
+    });
+  });
+});
+// DELETE (DELETE) a single party
+// API endpoint to delete a specific party from the database
+app.delete('/api/party/:id', (req, res) => {
+  const sql = `DELETE FROM parties WHERE id = ?`;
+  const params = [req.params.id];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: res.message });
+      // checks if anything was deleted
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Party not found'
+      });
+    } else {
+      res.json({
+        message: 'deleted',
+        changes: result.affectedRows,
+        id: req.params.id
+      });
+    }
+  });
 });
 
 
