@@ -68,7 +68,7 @@ router.delete('/candidate/:id', (req, res) => {
       }
     });
 });
-// CREATE a candidate
+// CREATE (POST) a candidate
 // API endpoint to create new candidate and store to table 
 // originally app.put('/api/candidate/:id')
 router.post('/candidate', ({ body }, res) => {
@@ -98,7 +98,7 @@ router.post('/candidate', ({ body }, res) => {
         });
     });
 });
-// UPDATE a candidate's party
+// UPDATE (PUT) a candidate's party
 // API endpoint for updating a specific candidate's party
 // originally app.delete('/api/candidate/:id')
 router.put('/candidate/:id', (req, res) => {
