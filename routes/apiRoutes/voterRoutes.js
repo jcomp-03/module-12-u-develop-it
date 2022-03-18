@@ -14,7 +14,7 @@ router.get('/voters', (req, res) => {
         return;
       }
       res.json({
-        message: 'success',
+        message: 'You successfully pulled all voters from the voters database',
         data: rows,
       });
     });
@@ -31,8 +31,7 @@ router.get('/voter/:id', (req, res) => {
       return;
     }
     res.json({
-      message: 'success',
-      data: row
+      message: `You successfully pulled voter with id ${params} from the voters database`
     });
   });
 });
@@ -54,7 +53,7 @@ router.post('/voter', ({ body }, res) => {
       return;
     }
     res.json({
-      message: 'success',
+      message: `You successfully inserted a new voter, ${body.first_name} ${body.last_name}, into the voters database`,
       data: body
     });
   });
@@ -81,7 +80,7 @@ router.put('/voter/:id', (req, res) => {
       });
     } else {
       res.json({
-        message: 'success',
+        message: `You successfully updated the email address to ${params[0]} for voter with id ${params[1]}.`,
         data: req.body,
         changes: result.affectedRows
       });
@@ -102,7 +101,7 @@ router.delete('/voter/:id', (req, res) => {
       });
     } else {
       res.json({
-        message: 'deleted',
+        message: `You succesfully deleted voter with id ${req.params.id}.`,
         changes: result.affectedRows,
         id: req.params.id
       });
